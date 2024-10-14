@@ -16,7 +16,8 @@ client.cooldowns = new Map();
 client.aliases = new Map();
 client.categories = fs.readdirSync('./src/commands/');
 
-const handlers = ['events', 'commands', 'antiCrash'];
+// const handlers = ['events', 'commands', 'antiCrash'];
+const handlers = ['events', 'commands'];
 
 handlers.forEach(h => {
     const handler = require(`./handlers/${h}`);
