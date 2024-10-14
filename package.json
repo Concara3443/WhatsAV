@@ -1,0 +1,15 @@
+{
+  "name": "whatsav",
+  "version": "0.0.1",
+  "description": "A WhatsApp bot for aviation lovers",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "Guillermo Cortés",
+  "license": "MIT",
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
+  }
+}
