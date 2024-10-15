@@ -1,8 +1,12 @@
+const config = require("../../../config/config.json");
+const settings = require("../../../config/settings.json");
 module.exports = {
-  name: "ping", // Asegúrate de que el nombre del comando esté definido aquí
-  description: "Gives you information on how fast the Bot is",
+  name: "ping", //the command name for execution & for helpcmd [OPTIONAL]
+  category: "Information", //the command category for helpcmd [OPTIONAL]
+  aliases: ["latency"], //the command aliases for helpcmd [OPTIONAL]
+  cooldown: 5, //the command cooldown for execution & for helpcmd [OPTIONAL]
   usage: "ping", //the command usage for helpcmd [OPTIONAL]
-  description: "Gives you information on how fast the Bot is", //the command description for helpcmd [OPTIONAL]
+  description: "Gives u information on how fast the Bot is", //the command description for helpcmd [OPTIONAL]
   memberpermissions: [], //Only allow members with specific Permissions to execute a Commmand [OPTIONAL]
   requiredroles: [], //Only allow specific Users with a Role to execute a Command [OPTIONAL]
   alloweduserids: [], //Only allow specific Users to execute a Command [OPTIONAL]
@@ -26,6 +30,7 @@ module.exports = {
       // });
     } catch (e) {
       console.log(String(e.stack));
+      return message.reply(`❌ ERROR | An error occurred\n\`\`\`${e.message ? String(e.message).slice(0, 2000) : String(e).slice(0, 2000)}\`\`\``);
     }
   }
 };
