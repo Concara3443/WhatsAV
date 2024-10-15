@@ -26,8 +26,10 @@ module.exports = async (client, message) => {
       if (command.maxargs && command.maxargs > 0 && args.length > command.maxargs) {
         return message.reply(command.argsmissing_message && command.argsmissing_message.trim().length > 0 ? command.argsmissing_message : command.usage ? "Usage: " + command.usage : "Wrong Command Usage")
       }
+
+      const contacto = await message.getContact();
       // Ejecutar el comando
-      await command.run(client, message, args);
+      await command.run(client, message, args, message.body.slice(mPrefix.length + cmd.length).trim().split("++").filter(Boolean), contacto, message.body, mPrefix);
     } catch (error) {
       console.error(error);
       message.reply('There was an error executing that command.');
