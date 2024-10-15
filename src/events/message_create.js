@@ -2,17 +2,32 @@ const config = require("../../config/config.json");
 
 module.exports = async (client, message) => {
 
-  const prefixRegex = new RegExp(`^${config.prefix}`);
+  // si el mensaje es del bot, no hacer nada
+  if (`${client.info.me.user}@${client.info.me.server}` == message.from) return;
 
-  const match = message.body.match(prefixRegex);
-  if (!match) return;
+  const chat = await message.getChat();
+  const isGroupMessage = chat.isGroup;
+  let mPrefix = '';
+  let args = [];
+  let cmd = '';
 
-  const [mPrefix] = match;
-  if (!mPrefix) return;
-  
+  if (isGroupMessage) {
+    const prefixRegex = new RegExp(`^${config.prefix}`);
+    const match = message.body.match(prefixRegex);
+    if (!match) return;
 
-  const args = message.body.slice(mPrefix.length).trim().split(/ +/).filter(Boolean);
-  const cmd = args.shift().toLowerCase();
+    [mPrefix] = match;
+    if (!mPrefix) return;
+
+    args = message.body.slice(mPrefix.length).trim().split(/ +/).filter(Boolean);
+    cmd = args.shift().toLowerCase();
+  } else {
+    args = message.body.trim().split(/ +/).filter(Boolean);
+    cmd = args.shift().toLowerCase();
+  }
+
+  // console.log(`Command: ${cmd}`);
+  // console.log(`Args: ${args}`);
 
   let command = client.commands.get(cmd);
   if (!command) command = client.commands.get(client.aliases.get(cmd));
