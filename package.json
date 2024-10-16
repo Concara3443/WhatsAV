@@ -4,7 +4,8 @@
   "description": "A WhatsApp bot for aviation lovers",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prepare": "node config/createsession.js"
   },
   "author": "Guillermo Cortés",
   "license": "MIT",
