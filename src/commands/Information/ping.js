@@ -7,6 +7,7 @@ module.exports = {
   cooldown: 5, //the command cooldown for execution & for helpcmd [OPTIONAL]
   usage: "ping", //the command usage for helpcmd [OPTIONAL]
   description: "Gives u information on how fast the Bot is", //the command description for helpcmd [OPTIONAL]
+  // Syntax: <> = required, [] = optional
   memberpermissions: [], //Only allow members with specific Permissions to execute a Commmand [OPTIONAL]
   requiredroles: [], //Only allow specific Users with a Role to execute a Command [OPTIONAL]
   alloweduserids: [], //Only allow specific Users to execute a Command [OPTIONAL]
