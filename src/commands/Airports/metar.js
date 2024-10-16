@@ -3,7 +3,7 @@ const settings = require("../../../config/settings.json");
 var axios = require("axios");
 module.exports = {
     name: "metar",
-    category: "Information",
+    category: "Airports",
     aliases: ["mt"],
     cooldown: 3,
     usage: "metar <Airport ICAO> [Airport ICAO] [Airport ICAO] ...",

@@ -4,7 +4,7 @@ const settings = require("../../../config/settings.json");
 var axios = require("axios");
 module.exports = {
     name: "search",
-    category: "Information",
+    category: "Airports",
     aliases: [],
     cooldown: 3,
     usage: "search <Airport name>",
