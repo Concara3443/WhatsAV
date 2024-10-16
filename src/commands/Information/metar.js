@@ -21,6 +21,13 @@ module.exports = {
         try {
             const icaoCodes = args.join(',');
 
+            if (icaoCodes.length == 0) {
+                return message.reply("Please provide at least one ICAO code.");
+            }
+            if (icaoCodes.length == 3) {
+                return message.reply(`Please provide an ICAO, (Maybe search for the airport with ${prefix}search <Airport name>)`);
+            }
+
             const options = {
                 method: 'GET',
                 url: 'https://aviationweather.gov/api/data/metar',
