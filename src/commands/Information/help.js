@@ -21,16 +21,16 @@ module.exports = {
             if (args[0]) {
                 const cmd = client.commands.get(args[0].toLowerCase()) || client.commands.get(client.aliases.get(args[0].toLowerCase()));
                 if (!cmd) {
-                    return message.reply(`No Information found for command **${args[0].toLowerCase()}**`);
+                    return message.reply(`No Information found for command *${args[0].toLowerCase()}*`);
                 }
-                let reply = `**Command name**: \`${cmd.name}\`\n`;
-                reply += `**Detailed Information about**: \`${cmd.name}\`\n`;
-                if (cmd.description) reply += `**Description**: \`${cmd.description}\`\n`;
-                if (cmd.aliases) reply += `**Aliases**: \`${cmd.aliases.map((a) => `${a}`).join("`, `")}\`\n`;
-                if (cmd.cooldown) reply += `**Cooldown**: \`${cmd.cooldown} Seconds\`\n`;
-                else reply += `**Cooldown**: \`${settings.default_cooldown_in_sec} Second\`\n`;
+                let reply = `*Command name*: \`${cmd.name}\`\n`;
+                reply += `*Detailed Information about*: \`${cmd.name}\`\n`;
+                if (cmd.description) reply += `*Description*: \`${cmd.description}\`\n`;
+                if (cmd.aliases) reply += `*Aliases*: \`${cmd.aliases.map((a) => `${a}`).join("`, `")}\`\n`;
+                if (cmd.cooldown) reply += `*Cooldown*: \`${cmd.cooldown} Seconds\`\n`;
+                else reply += `*Cooldown*: \`${settings.default_cooldown_in_sec} Second\`\n`;
                 if (cmd.usage) {
-                    reply += `**Usage**: \`${prefix}${cmd.usage}\`\n`;
+                    reply += `*Usage*: \`${prefix}${cmd.usage}\`\n`;
                     reply += `Syntax: <> = required, [] = optional`;
                 }
                 return message.reply(reply);
@@ -44,7 +44,7 @@ module.exports = {
                     for (let i = 0; i < client.categories.length; i += 1) {
                         const current = client.categories[i];
                         const items = commands(current);
-                        reply += `**${current.toUpperCase()} [${items.length}]**: ${items.join(", ")}\n`;
+                        reply += `*${current.toUpperCase()} [${items.length}]*: ${items.join(", ")}\n`;
                     }
                 } catch (e) {
                     console.log(String(e.stack));
