@@ -32,7 +32,6 @@ module.exports = {
                 method: 'GET',
                 url: 'https://aviationweather.gov/api/data/metar',
                 params: { ids: icaoCodes, format: 'json', taf: 'false' },
-                headers: { Accept: '*/*', 'User-Agent': 'Thunder Client (https://www.thunderclient.com)' }
             };
 
             axios.request(options).then(function (response) {
