@@ -12,13 +12,7 @@ module.exports = {
     memberpermissions: [],
     requiredroles: [],
     alloweduserids: [],
-    minargs: 0,
-    maxargs: 0,
-    minplusargs: 0,
-    maxplusargs: 0,
-    argsmissing_message: "",
-    argstoomany_message: "",
-    run: async (client, message, args, plusArgs, chatId, text, prefix) => {
+    run: async (client, message, args, chatId, text, prefix) => {
         try {
             const icaoCodes = args.join(',');
 
