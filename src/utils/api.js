@@ -16,7 +16,6 @@ async function fetchData(endpoint, params) {
 
     try {
         const response = await axios.get(endpoint, { headers, params });
-        console.log(response);
         return response.data;
     } catch (error) {
         if (error.response) {
