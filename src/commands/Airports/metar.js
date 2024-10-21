@@ -24,8 +24,11 @@ module.exports = {
             if (icaoCodes.length == 0) {
                 return message.reply("Please provide at least one ICAO code.");
             }
-            if (icaoCodes.length == 3) {
-                return message.reply(`Please provide an ICAO, (Maybe search for the airport with ${prefix}search <Airport name>)`);
+
+            for (const code of args) {
+                if (code.length !== 4) {
+                    return message.reply(`The code "${code}" is invalid. You must provide an icao code.`);
+                }
             }
 
             const options = {
