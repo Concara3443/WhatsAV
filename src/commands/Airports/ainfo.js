@@ -1,5 +1,6 @@
 const config = require("../../../config/config.json");
 const settings = require("../../../config/settings.json");
+const { fetchData } = require("../../utils/api.js");
 var axios = require("axios");
 const { Location } = require('whatsapp-web.js');
 module.exports = {
@@ -28,33 +29,23 @@ module.exports = {
             }
 
             var iType = args.length == 3 ? "iata" : "icao";
+            const endpoint = `https://aerodatabox.p.rapidapi.com/airports/${iType}/${args}`;
 
-            const options = {
-                method: 'GET',
-                url: `https://aerodatabox.p.rapidapi.com/airports/${iType}/${args}`,
-                headers: {
-                    'x-rapidapi-key': '1a81ea4217mshdb75d2819e9277cp11e1bcjsn94eb148edf29',
-                    'x-rapidapi-host': 'aerodatabox.p.rapidapi.com'
-                }
-            };
+            fetchData(endpoint, {}).then(function (response) {
 
-            try {
-                const response = await axios.request(options);
-                const data = response.data;
+                let replyMessage = `*${response.fullName} (${response.shortName})*`;
 
-                let replyMessage = `*${data.fullName} (${data.shortName})*`;
+                if (response.icao) replyMessage += `\n- *ICAO*: ${response.icao}`;
+                if (response.iata) replyMessage += `\n- *IATA*: ${response.iata}`;
+                if (response.timeZone) replyMessage += `\n- *Time Zone*: ${response.timeZone}`;
+                if (response.urls.webSite) replyMessage += `\n- *Website*: ${response.urls.webSite}`;
+                if (response.urls.wikipedia) replyMessage += `\n- *Wikipedia*: ${response.urls.wikipedia}`;
+                if (response.urls.twitter) replyMessage += `\n- *Twitter*: ${response.urls.twitter}`;
+                if (response.urls.flightRadar) replyMessage += `\n- *Flight Radar*: ${response.urls.flightRadar}`;
 
-                if (data.icao) replyMessage += `\n- *ICAO*: ${data.icao}`;
-                if (data.iata) replyMessage += `\n- *IATA*: ${data.iata}`;
-                if (data.timeZone) replyMessage += `\n- *Time Zone*: ${data.timeZone}`;
-                if (data.urls.webSite) replyMessage += `\n- *Website*: ${data.urls.webSite}`;
-                if (data.urls.wikipedia) replyMessage += `\n- *Wikipedia*: ${data.urls.wikipedia}`;
-                if (data.urls.twitter) replyMessage += `\n- *Twitter*: ${data.urls.twitter}`;
-                if (data.urls.flightRadar) replyMessage += `\n- *Flight Radar*: ${data.urls.flightRadar}`;
-
-                const location = new Location(data.location.lat, data.location.lon, {
-                    name: data.fullName,
-                    url: data.urls.googleMaps
+                const location = new Location(response.location.lat, response.location.lon, {
+                    name: response.fullName,
+                    url: response.urls.googleMaps
                 });
 
                 message.reply(replyMessage).then(() => {
@@ -64,10 +55,10 @@ module.exports = {
                     message.reply("❌ ERROR | Failed to send location.");
                 });
 
-            } catch (error) {
+            }).catch(error => {
                 console.error(error);
                 message.reply("❌ ERROR | Failed to fetch airport information.");
-            }
+            });
 
         } catch (e) {
             console.log(String(e.stack));

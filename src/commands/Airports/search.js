@@ -1,6 +1,7 @@
 require('dotenv').config();
 const config = require("../../../config/config.json");
 const settings = require("../../../config/settings.json");
+const { fetchData } = require("../../utils/api.js");
 var axios = require("axios");
 module.exports = {
     name: "search",
@@ -26,34 +27,27 @@ module.exports = {
                 return message.reply("The search query must be at least 3 characters long.");
             }
 
-            const options = {
-                method: 'GET',
-                url: 'https://aerodatabox.p.rapidapi.com/airports/search/term',
-                params: {
-                    q: args.join(' '),
-                    limit: '5'
-            },
-                headers: {
-                    'x-rapidapi-key': process.env.RAPID_API_KEY,
-                    'x-rapidapi-host': 'aerodatabox.p.rapidapi.com'
-                }
+            const endpoint = `https://aerodatabox.p.rapidapi.com/airports/search/term`;
+
+            const params = {
+                q: args.join(' '),
+                limit: '5'
             };
 
-            try {
-                const response = await axios.request(options);
-                if (response.data.count === 0) {
+            fetchData(endpoint, params).then(function (response) {
+                if (response.count === 0) {
                     return message.reply("No airports found for the given search query.");
                 }
 
                 let replyMessage = "Airports found:\n";
-                response.data.items.forEach((item, index) => {
+                response.items.forEach((item, index) => {
                     replyMessage += `${index + 1}. *${item.name.trim()}* (${item.iata}/${item.icao}) - ${item.municipalityName}, ${item.countryCode}\n\n`;
                 });
 
                 message.reply(replyMessage);
-            } catch (error) {
+            }).catch(error => {
                 console.error(error);
-            }
+            });
 
         } catch (e) {
             console.log(String(e.stack));
