@@ -18,7 +18,7 @@ module.exports = {
     maxplusargs: 0,
     argsmissing_message: "",
     argstoomany_message: "",
-    run: async (client, message, args, plusArgs, contact, text, prefix) => {
+    run: async (client, message, args, plusArgs, chatId, text, prefix) => {
         try {
 
             query = args.join(' ');

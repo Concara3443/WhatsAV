@@ -16,7 +16,7 @@ module.exports = {
     maxplusargs: 0,
     argsmissing_message: "",
     argstoomany_message: "",
-    run: async (client, message, args, plusArgs, contact, text, prefix) => {
+    run: async (client, message, args, plusArgs, chatId, text, prefix) => {
         try {
             if (args[0]) {
                 const cmd = client.commands.get(args[0].toLowerCase()) || client.commands.get(client.aliases.get(args[0].toLowerCase()));

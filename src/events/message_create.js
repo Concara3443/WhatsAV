@@ -42,9 +42,8 @@ module.exports = async (client, message) => {
         return message.reply(command.argsmissing_message && command.argsmissing_message.trim().length > 0 ? command.argsmissing_message : command.usage ? "Usage: " + command.usage : "Wrong Command Usage")
       }
 
-      const contacto = await message.getContact();
       // Ejecutar el comando
-      await command.run(client, message, args, message.body.slice(mPrefix.length + cmd.length).trim().split("++").filter(Boolean), contacto, message.body, mPrefix);
+      await command.run(client, message, args, message.body.slice(mPrefix.length + cmd.length).trim().split("++").filter(Boolean), message.from, message.body, mPrefix);
     } catch (error) {
       console.error(error);
       message.reply('There was an error executing that command.');
