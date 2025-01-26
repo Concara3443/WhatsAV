@@ -1,6 +1,6 @@
 # Repository files
 /session
-.wwebjs_cache
+.wwebjs_*
 
 # Logs
 logs
