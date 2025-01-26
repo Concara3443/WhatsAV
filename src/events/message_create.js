@@ -29,6 +29,9 @@ module.exports = async (client, message) => {
   } else {
     args = message.body.trim().split(/ +/).filter(Boolean);
     cmd = args.shift().toLowerCase();
+    if (cmd.startsWith(config.prefix)) {
+      cmd = cmd.slice(config.prefix.length);
+    }
   }
 
   let command = client.commands.get(cmd);
