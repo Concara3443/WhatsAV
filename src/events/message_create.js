@@ -2,6 +2,8 @@ const config = require("../../config/config.json");
 
 module.exports = async (client, message) => {
 
+    if (!message) return;
+
     // si el mensaje es del bot, no hacer nada
     if (`${client.info.me.user}@${client.info.me.server}` == message.from) return;
 
