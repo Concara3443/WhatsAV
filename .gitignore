@@ -1,6 +1,6 @@
 # Repository files
 /config/session
-/config/.wwebjs_cache
+.wwebjs_cache
 
 # Logs
 logs
