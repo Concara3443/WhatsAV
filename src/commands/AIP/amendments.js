@@ -6,9 +6,6 @@ module.exports = {
     cooldown: 5,
     usage: "amendments",
     description: "Fetches and displays amendments information from AIP Spain.",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
             const url = 'https://scrapeninja.p.rapidapi.com/scrape';

@@ -8,9 +8,6 @@ module.exports = {
     cooldown: 3,
     usage: "search <Departure airport code> [Arrival airport code]",
     description: "Returns all the flights between the provided airports in the next 12 hours. If no arrival airport is provided, all flights departing from the departure airport will be shown.\nOPTIONS: If -cs is provided, codeshared flights will be included.",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
     

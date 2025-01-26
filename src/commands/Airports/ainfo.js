@@ -10,9 +10,6 @@ module.exports = {
     cooldown: 3,
     usage: "ainfo <Airport ICAO/ Airpot IATA>",
     description: "Returns information about the provided airport.",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
 

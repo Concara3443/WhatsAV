@@ -9,9 +9,6 @@ module.exports = {
     cooldown: 3,
     usage: "runway <Airport ICAO>",
     description: "Returns the runways with favorable wind at an airport",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
             const icaoCodes = args.join(',');

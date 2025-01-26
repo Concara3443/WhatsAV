@@ -10,9 +10,6 @@ module.exports = {
     cooldown: 3,
     usage: "search <Airport name>",
     description: "Returns the information of the provided Airport name.",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
 

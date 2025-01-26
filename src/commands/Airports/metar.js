@@ -8,9 +8,6 @@ module.exports = {
     cooldown: 3,
     usage: "metar <Airport ICAO> [Airport ICAO] [Airport ICAO] ...",
     description: "Returns the METAR data for the provided ICAO code.",
-    memberpermissions: [],
-    requiredroles: [],
-    alloweduserids: [],
     run: async (client, message, args, chatId, text, prefix) => {
         try {
             const icaoCodes = args.join(',');
