@@ -16,11 +16,21 @@ module.exports = {
                     memory: 'Hi-Jack = 75 (sounds like "Hi Five")'
                 },
                 '7600': {
-                    name: 'RADIO FAILURE',
+                    name: 'RADIO FAILURE (IFR)',
                     emoji: '📻',
-                    description: 'Lost communication (NORDO)',
-                    action: 'Squawk 7600, fly last assigned altitude, follow published procedures.',
-                    memory: '76 = "Seven Six, Radio Fix" or "Can\'t Hear You Six"'
+                    description: 'Lost communication - CONTINUING on IFR route',
+                    action: 'Continue on last assigned route/altitude. Follow published lost comms procedures. Stay IFR.',
+                    memory: '76 = "Seven Six, Radio Fix"',
+                    diff: '→ Use when continuing your IFR flight plan'
+                },
+                '7601': {
+                    name: 'RADIO FAILURE (VMC DIVERT)',
+                    emoji: '📻✈️',
+                    description: 'Lost communication - LEAVING IFR, diverting VMC to nearest airport',
+                    action: 'You have radio failure BUT you\'re in VMC and choosing to divert visually to nearest suitable aerodrome instead of continuing IFR.',
+                    memory: '7601 = 7600 + 1 = "Radio failure, going visual"',
+                    diff: '→ Use when ABANDONING IFR to land visually',
+                    note: '⚠️ Europe only (May 2025). Not valid in UK/Switzerland - use 7600.'
                 },
                 '7700': {
                     name: 'EMERGENCY',
@@ -74,7 +84,13 @@ module.exports = {
                 reply += `${info.emoji} *${info.name}*\n\n`;
                 reply += `*Meaning:* ${info.description}\n\n`;
                 reply += `*Action:* ${info.action}\n\n`;
+                if (info.diff) {
+                    reply += `${info.diff}\n\n`;
+                }
                 reply += `*Memory aid:* ${info.memory}`;
+                if (info.note) {
+                    reply += `\n\n${info.note}`;
+                }
             } else if (commonCodes[code]) {
                 reply += `*Meaning:* ${commonCodes[code]}`;
             } else {
