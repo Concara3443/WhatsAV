@@ -1,6 +1,23 @@
 # Repository files
 /session
 .wwebjs_*
+.wwebjs_auth/
+
+# WinSW Service files
+*.exe
+*.xml
+WhatsAV-service*
+logs/
+
+# Puppeteer
+.puppeteerrc.cjs
+
+# Claude Code
+.claude/
+
+# Temporary files
+nul
+*.tmp
 
 # Logs
 logs
