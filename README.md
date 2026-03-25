@@ -1,6 +1,8 @@
 # WhatsAV
 
-WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number **+44 73 0856 4711** or by following [https://wa.me/447308564711](https://wa.me/447308564711).
+WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number **+44 73 0856 4711** or by clicking the link below:
+
+**[Start chatting with WhatsAV](https://wa.me/447308564711?text=Hi!%20How%20does%20WhatsAV%20work%3F)**
 
 **Author:** Guillermo Cortés | [guillermocort.es](https://guillermocort.es)
 

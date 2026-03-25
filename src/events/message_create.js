@@ -18,14 +18,50 @@ module.exports = async (client, message) => {
   if (message.fromMe) return;
   if (`${client.info.me.user}@${client.info.me.server}` == message.from) return;
 
-  const chat = await message.getChat();
-  const isGroupMessage = chat.isGroup;
+  // Detectar si es grupo sin llamar getChat() - mucho más rápido
+  const isGroupMessage = message.from.endsWith('@g.us');
   let args = [];
   let cmd = "";
 
   // Limpiar el texto del mensaje
   const cleanBody = cleanWhatsAppText(message.body);
   if (!cleanBody) return;
+
+  // Mensaje especial de bienvenida (desde el link de WhatsApp)
+  const welcomeMessages = [
+    "hi! how does whatsav work?",
+    "hi how does whatsav work",
+    "how does whatsav work",
+    "how does whatsav work?"
+  ];
+
+  if (!isGroupMessage && welcomeMessages.includes(cleanBody.toLowerCase())) {
+    const welcomeReply = `*Welcome to WhatsAV!* ✈️
+
+I'm an aviation bot that provides real-time flight data.
+
+*Quick Start:*
+Just type a command directly! No prefix needed.
+
+*Popular Commands:*
+• \`metar LEMD\` - Weather at Madrid airport
+• \`taf KJFK\` - Forecast for JFK
+• \`wx EGLL\` - Simple weather summary
+• \`notam LEBL\` - NOTAMs for Barcelona
+• \`airac\` - Current AIRAC cycle
+• \`help\` - All commands
+
+*Example:*
+Try typing: \`metar LEMD\`
+
+*In Groups:*
+Mention me + command: @WhatsAV metar LEMD
+
+_Created by Guillermo Cortés_
+_guillermocort.es_`;
+
+    return message.reply(welcomeReply);
+  }
 
   if (isGroupMessage) {
     // En grupos: detectar si el bot fue mencionado

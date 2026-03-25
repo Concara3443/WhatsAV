@@ -19,7 +19,7 @@ module.exports = {
 ${pkg.description}
 
 *Contact:*
-WhatsApp: +44 73 0856 4711
+WhatsApp: wa.me/447308564711?text=Hi!%20How%20does%20WhatsAV%20work%3F
 GitHub: github.com/Concara3443/WhatsAV
 Web: guillermocort.es
 
