@@ -11,6 +11,54 @@ function cleanWhatsAppText(text) {
     .trim();
 }
 
+// Levenshtein distance para encontrar comandos similares
+function levenshtein(a, b) {
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+// Buscar comandos similares
+function findSimilarCommands(input, commands, aliases, maxDistance = 3) {
+  const suggestions = [];
+  const allCommands = [...commands.keys()];
+
+  for (const cmdName of allCommands) {
+    const distance = levenshtein(input.toLowerCase(), cmdName.toLowerCase());
+    if (distance <= maxDistance && distance > 0) {
+      suggestions.push({ name: cmdName, distance });
+    }
+  }
+
+  // También buscar en aliases
+  for (const [alias, cmdName] of aliases.entries()) {
+    const distance = levenshtein(input.toLowerCase(), alias.toLowerCase());
+    if (distance <= maxDistance && distance > 0) {
+      suggestions.push({ name: `${alias} (→ ${cmdName})`, distance });
+    }
+  }
+
+  // Ordenar por distancia y devolver los mejores
+  return suggestions
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3)
+    .map(s => s.name);
+}
+
 module.exports = async (client, message) => {
   if (!message) return;
 
@@ -64,15 +112,32 @@ _guillermocort.es_`;
   }
 
   if (isGroupMessage) {
-    // En grupos: detectar si el bot fue mencionado
-    const botId = client.info.me.user;
-    const botMentioned = message.mentionedIds?.some(id => id.includes(botId));
+    // En grupos: detectar si el bot fue mencionado usando getMentions()
+    const botId = client.info.me.user; // número del bot: 447308564711
+
+    // Obtener menciones reales (devuelve Contact objects)
+    const mentions = await message.getMentions();
+
+    // Verificar si el bot está en las menciones
+    const botMentioned = mentions.some(contact =>
+      contact.id?.user === botId ||
+      contact.id?._serialized?.includes(botId) ||
+      contact.number === botId
+    );
+
     if (!botMentioned) return;
 
-    // Extraer comando removiendo la mención
-    const bodyWithoutMention = cleanBody.replace(/@\d+/g, '').trim();
+    // Extraer comando removiendo la mención (@número)
+    const bodyWithoutMention = cleanBody
+      .replace(new RegExp(`@${botId}`, 'g'), '')
+      .replace(/@\d+/g, '')
+      .trim();
+
     args = bodyWithoutMention.split(/ +/).filter(Boolean);
-    if (args.length === 0) return;
+    if (args.length === 0) {
+      // Si solo mencionaron al bot sin comando, mostrar ayuda
+      return message.reply(`*WhatsAV* ✈️\n\nMencióneme + comando:\n\`@WhatsAV help\`\n\`@WhatsAV metar LEMD\``);
+    }
     cmd = args.shift().toLowerCase();
   } else {
     // Privado: sin prefijo, escribir comando directamente
@@ -130,6 +195,22 @@ _guillermocort.es_`;
       message.reply("There was an error executing that command.");
     }
   } else {
-    console.log(`Command not found: ${cmd}`);
+    // Solo responder en privado, no en grupos
+    if (!isGroupMessage && cmd.length >= 2) {
+      const similar = findSimilarCommands(cmd, client.commands, client.aliases);
+
+      let reply = `❓ Command not found: \`${cmd}\`\n`;
+
+      if (similar.length > 0) {
+        reply += `\n*Did you mean?*\n`;
+        similar.forEach(s => {
+          reply += `• \`${s}\`\n`;
+        });
+      }
+
+      reply += `\n_Type \`help\` to see all commands_`;
+
+      return message.reply(reply);
+    }
   }
 };
