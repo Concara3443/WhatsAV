@@ -10,11 +10,11 @@ module.exports = {
     description: "Returns the METAR data for the provided ICAO code.",
     run: async (client, message, args, chatId, text, prefix) => {
         try {
-            const icaoCodes = args.join(',');
-
-            if (icaoCodes.length == 0) {
+            if (args.length === 0) {
                 return message.reply("Please provide at least one ICAO code.");
             }
+
+            const icaoCodes = args.join(',');
 
             for (const code of args) {
                 if (code.length !== 4) {

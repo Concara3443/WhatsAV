@@ -1,37 +1,48 @@
-const config = require("../../config/config.json");
+// Función para limpiar caracteres invisibles de WhatsApp
+function cleanWhatsAppText(text) {
+  if (!text) return '';
+  return text
+    // Eliminar caracteres invisibles y de control Unicode
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u180E]/g, '')
+    // Eliminar caracteres de formato LTR/RTL
+    .replace(/[\u200E\u200F\u202A-\u202E]/g, '')
+    // Eliminar otros caracteres de control
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+    .trim();
+}
 
 module.exports = async (client, message) => {
   if (!message) return;
 
-  // si el mensaje es del bot, no hacer nada
+  // Si el mensaje es del bot, no hacer nada
+  if (message.fromMe) return;
   if (`${client.info.me.user}@${client.info.me.server}` == message.from) return;
 
   const chat = await message.getChat();
   const isGroupMessage = chat.isGroup;
-  let mPrefix = "";
   let args = [];
   let cmd = "";
 
+  // Limpiar el texto del mensaje
+  const cleanBody = cleanWhatsAppText(message.body);
+  if (!cleanBody) return;
+
   if (isGroupMessage) {
-    const prefixRegex = new RegExp(`^${config.prefix}`);
-    const match = message.body.match(prefixRegex);
-    if (!match) return;
+    // En grupos: detectar si el bot fue mencionado
+    const botId = client.info.me.user;
+    const botMentioned = message.mentionedIds?.some(id => id.includes(botId));
+    if (!botMentioned) return;
 
-    [mPrefix] = match;
-    if (!mPrefix) return;
-
-    args = message.body
-      .slice(mPrefix.length)
-      .trim()
-      .split(/ +/)
-      .filter(Boolean);
+    // Extraer comando removiendo la mención
+    const bodyWithoutMention = cleanBody.replace(/@\d+/g, '').trim();
+    args = bodyWithoutMention.split(/ +/).filter(Boolean);
+    if (args.length === 0) return;
     cmd = args.shift().toLowerCase();
   } else {
-    args = message.body.trim().split(/ +/).filter(Boolean);
+    // Privado: sin prefijo, escribir comando directamente
+    args = cleanBody.split(/ +/).filter(Boolean);
+    if (args.length === 0) return;
     cmd = args.shift().toLowerCase();
-    if (cmd.startsWith(config.prefix)) {
-      cmd = cmd.slice(config.prefix.length);
-    }
   }
 
   let command = client.commands.get(cmd);
@@ -76,7 +87,7 @@ module.exports = async (client, message) => {
         args,
         message.from,
         message.body,
-        mPrefix
+        ""
       );
     } catch (error) {
       console.error(error);

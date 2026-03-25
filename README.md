@@ -1,25 +1,73 @@
 # WhatsAV
 
-WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number +34601557035 or by following [https://wa.me/34601557035](https://wa.me/34601557035).
+WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number **+44 73 0856 4711** or by following [https://wa.me/447308564711](https://wa.me/447308564711).
 
 ## Features
 
-- **Commands**: The bot supports various commands related to aircrafts, airports, and general information.
-- **Events**: The bot handles multiple events to ensure smooth operation.
-- **Error Handling**: Robust error handling to manage unhandled rejections and exceptions.
+- **Aviation Data**: Get real-time METAR, TAF, NOTAMs, and airport information.
+- **Flight Search**: Search for flights between airports.
+- **AIP Information**: Access amendments and AIP data for Spain.
+- **Easy to Use**: No prefix needed in private chats!
+
+## How to Use
+
+### Private Chat
+Simply write the command directly:
+```
+metar LEMD
+taf KJFK
+help
+```
+
+### Groups
+Mention the bot followed by your command:
+```
+@WhatsAV metar LEMD
+@WhatsAV help
+```
+
+## Available Commands
+
+### Information
+| Command | Description |
+|---------|-------------|
+| `help` | Shows all available commands |
+| `ping` | Check bot latency |
+| `about` | Information about the bot |
+| `status` | Bot status and uptime |
+
+### Airports
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `metar` | `metar <ICAO> [ICAO...]` | Get METAR data for airports |
+| `taf` | `taf <ICAO> [ICAO...]` | Get TAF forecast for airports |
+| `notam` | `notam <ICAO>` | Get active NOTAMs for an airport |
+| `ainfo` | `ainfo <ICAO/IATA>` | Get airport information |
+| `runway` | `runway <ICAO>` | Get runway information with wind conditions |
+| `search` | `search <name>` | Search airports by name |
+
+### Flights
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `fsearch` | `fsearch <DEP> [ARR]` | Search flights between airports |
+
+### AIP (Spain)
+| Command | Description |
+|---------|-------------|
+| `amendments` | Get AIP Spain amendments |
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js
+- Node.js (v16 or higher)
 - npm
 
 ### Installation
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/WhatsAV.git
+    git clone https://github.com/Concara3443/WhatsAV.git
     cd WhatsAV
     ```
 
@@ -28,11 +76,14 @@ WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with t
     npm install
     ```
 
-3. Create a `.env` file and add your environment variables.
+3. Create a `.env` file with your API keys:
+    ```
+    RAPIDAPI_KEY=your_rapidapi_key_here
+    ```
 
 ### Running the Bot
 
-1. Prepare the session:
+1. Prepare the session (scan QR code):
     ```sh
     npm run prepare
     ```
@@ -42,18 +93,35 @@ WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with t
     npm start
     ```
 
-## Configuration
+### Running as a Windows Service (WinSW)
 
-You can configure the bot by editing the [config/config.json](config/config.json) file. For example, you can change the command prefix:
-
-```json
-{
-    "prefix": "!"
-}
-```
+1. Download WinSW and place it in the project directory
+2. Create/edit `WhatsAV-service.xml`:
+    ```xml
+    <service>
+      <id>WhatsAV</id>
+      <name>WhatsAV Bot</name>
+      <description>WhatsApp Aviation Bot</description>
+      <executable>node</executable>
+      <arguments>src/index.js</arguments>
+      <workingdirectory>C:\path\to\WhatsAV</workingdirectory>
+      <logpath>C:\path\to\WhatsAV\logs</logpath>
+      <log mode="roll-by-size">
+        <sizeThreshold>10240</sizeThreshold>
+        <keepFiles>8</keepFiles>
+      </log>
+    </service>
+    ```
+3. Install and start the service:
+    ```sh
+    WhatsAV-service.exe install
+    WhatsAV-service.exe start
+    ```
 
 ## Contributing
+
 Feel free to fork the repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

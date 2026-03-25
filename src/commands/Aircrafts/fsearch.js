@@ -18,7 +18,7 @@ module.exports = {
             }
             
             if (args.length < 1 || args.length > 3) {
-                return message.reply("AAAAAPlease provide a departure airport code and optionally an arrival airport code.");
+                return message.reply("Please provide a departure airport code and optionally an arrival airport code.");
             }
 
             const departureAirport = args[0].toUpperCase();

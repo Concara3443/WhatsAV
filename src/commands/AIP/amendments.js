@@ -8,6 +8,10 @@ module.exports = {
     description: "Fetches and displays amendments information from AIP Spain.",
     run: async (client, message, args, chatId, text, prefix) => {
         try {
+            if (!process.env.RAPIDAPI_KEY) {
+                return message.reply("❌ ERROR | RAPIDAPI_KEY is not configured.");
+            }
+
             const url = 'https://scrapeninja.p.rapidapi.com/scrape';
             const headers = {
                 "Content-Type": "application/json",

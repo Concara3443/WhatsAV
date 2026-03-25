@@ -1,7 +1,4 @@
-const config = require("../../../config/config.json");
-const settings = require("../../../config/settings.json");
 const { fetchData } = require("../../utils/api.js");
-var axios = require("axios");
 const { Location } = require('whatsapp-web.js');
 module.exports = {
     name: "ainfo",
@@ -12,15 +9,17 @@ module.exports = {
     description: "Returns information about the provided airport.",
     run: async (client, message, args, chatId, text, prefix) => {
         try {
-
-            args = args.join(" ")
-
-            if (args.length === 0 || (args.length !== 3 && args.length !== 4)) {
+            if (args.length !== 1) {
                 return message.reply("Please provide an ICAO or IATA code.");
             }
 
-            var iType = args.length == 3 ? "iata" : "icao";
-            const endpoint = `https://aerodatabox.p.rapidapi.com/airports/${iType}/${args}`;
+            const code = args[0].toUpperCase();
+            if (code.length !== 3 && code.length !== 4) {
+                return message.reply("Please provide a valid ICAO (4 chars) or IATA (3 chars) code.");
+            }
+
+            const iType = code.length === 3 ? "iata" : "icao";
+            const endpoint = `https://aerodatabox.p.rapidapi.com/airports/${iType}/${code}`;
 
             fetchData(endpoint, {}).then(function (response) {
 

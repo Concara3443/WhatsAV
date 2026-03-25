@@ -13,7 +13,7 @@ module.exports = {
     run: async (client, message, args, chatId, text, prefix) => {
         try {
 
-            query = args.join(' ');
+            const query = args.join(' ');
             if (query.length < 3) {
                 return message.reply("The search query must be at least 3 characters long.");
             }

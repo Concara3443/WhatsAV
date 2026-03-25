@@ -2,10 +2,12 @@ const { Client, LocalAuth } = require("whatsapp-web.js");
 const fs = require("fs");
 
 const client = new Client({
+  authStrategy: new LocalAuth({
+    dataPath: "C:\\Users\\Administrator\\Documents\\Github\\WhatsAV\\.wwebjs_auth"
+  }),
   puppeteer: {
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   },
-  authStrategy: new LocalAuth(),
 });
 
 // Definir algunas colecciones globales
@@ -14,7 +16,6 @@ client.cooldowns = new Map();
 client.aliases = new Map();
 client.categories = fs.readdirSync("./src/commands/");
 
-// const handlers = ['events', 'commands', 'antiCrash'];
 const handlers = ["events", "commands"];
 
 handlers.forEach((h) => {

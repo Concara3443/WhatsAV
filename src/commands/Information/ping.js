@@ -16,16 +16,8 @@ module.exports = {
   argstoomany_message: "", //Message if the user has too many / not enough args / too many plus args, which will be sent, leave emtpy / dont add, if you wanna use command.usage or the default message! [OPTIONAL]
   run: async (client, message, args, plusArgs, contact, text, prefix) => {
     try {
-      var date = Date.now();
-      const replyMessage = await message.reply(`🏓 Pinging....`);
-      
-      // Verificar si client.ws y client.ws.ping están definidos
-      // const apiLatency = client.ws && client.ws.ping ? Math.round(client.ws.ping) : 'N/A';
-      
-      // Editar el mensaje con la latencia calculada
-      // await replyMessage.edit({
-      //   content: `🏓 Ping: \`${Math.round(Date.now() - date)}ms\`\n\n:robot: Api Latency: \`${apiLatency}ms\``
-      // });
+      const startTime = Date.now();
+      await message.reply(`🏓 Pong! Latency: \`${Date.now() - startTime}ms\``);
     } catch (e) {
       console.log(String(e.stack));
       return message.reply(`❌ ERROR | An error occurred\n\`\`\`${e.message ? String(e.message).slice(0, 2000) : String(e).slice(0, 2000)}\`\`\``);

@@ -11,22 +11,19 @@ module.exports = {
     description: "Returns the runways with favorable wind at an airport",
     run: async (client, message, args, chatId, text, prefix) => {
         try {
-            const icaoCodes = args.join(',');
-
-            if (icaoCodes.length == 0) {
-                return message.reply("Please provide at least one ICAO code.");
+            if (args.length !== 1) {
+                return message.reply("Please provide exactly one ICAO code.");
             }
 
-            for (const code of args) {
-                if (code.length !== 4) {
-                    return message.reply(`The code "${code}" is invalid. You must provide an icao code.`);
-                }
+            const icaoCode = args[0].toUpperCase();
+            if (icaoCode.length !== 4) {
+                return message.reply(`The code "${icaoCode}" is invalid. You must provide an ICAO code (4 characters).`);
             }
 
             const options = {
                 method: 'GET',
                 url: 'https://aviationweather.gov/api/data/metar',
-                params: { ids: icaoCodes, format: 'json', taf: 'false' },
+                params: { ids: icaoCode, format: 'json', taf: 'false' },
             };
 
             axios.request(options).then(function (response) {
@@ -37,7 +34,7 @@ module.exports = {
                     return message.reply("No METAR data found for the provided ICAO codes.");
                 }
 
-                const endpoint = `https://aerodatabox.p.rapidapi.com/airports/icao/${args}/runways`;
+                const endpoint = `https://aerodatabox.p.rapidapi.com/airports/icao/${icaoCode}/runways`;
                 fetchData(endpoint, {}).then(function (response) {
 
                     if (response.length === 0) {
