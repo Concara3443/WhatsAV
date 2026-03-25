@@ -8,9 +8,10 @@ WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with t
 
 ## Features
 
-- **Aviation Data**: Get real-time METAR, TAF, NOTAMs, and airport information.
-- **Flight Search**: Search for flights between airports.
-- **AIP Information**: Access amendments and AIP data for Spain.
+- **Real-time Weather**: METAR, TAF, decoded weather summaries
+- **Flight Calculators**: Descent, crosswind, fuel, TAS, ETE
+- **Airport Information**: NOTAMs, runways, search
+- **Utilities**: Unit converter, phonetic alphabet, squawk codes
 - **Easy to Use**: No prefix needed in private chats!
 
 ## How to Use
@@ -19,8 +20,8 @@ WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with t
 Simply write the command directly:
 ```
 metar LEMD
-taf KJFK
-help
+wx KJFK
+descent 35000 3000 120 450
 ```
 
 ### Groups
@@ -32,24 +33,28 @@ Mention the bot followed by your command:
 
 ## Available Commands
 
-### Information
-| Command | Description |
-|---------|-------------|
-| `help` | Shows all available commands |
-| `ping` | Check bot latency |
-| `about` | Information about the bot |
-| `status` | Bot status and uptime |
-
-### Airports
+### Weather
 | Command | Usage | Description |
 |---------|-------|-------------|
-| `metar` | `metar <ICAO> [ICAO...]` | Get METAR data for airports |
-| `taf` | `taf <ICAO> [ICAO...]` | Get TAF forecast for airports |
-| `wx` | `wx <ICAO>` | Human-readable weather summary |
-| `decode` | `decode <ICAO>` | Detailed METAR decode with explanations |
-| `notam` | `notam <ICAO>` | Get active NOTAMs for an airport |
-| `ainfo` | `ainfo <ICAO/IATA>` | Get airport information |
-| `runway` | `runway <ICAO>` | Get runway information with wind conditions |
+| `metar` | `metar <ICAO> [ICAO...]` | Raw METAR observation |
+| `wx` | `wx <ICAO>` | Decoded weather summary |
+| `taf` | `taf <ICAO> [ICAO...]` | TAF forecast |
+
+### Flight Calculators
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `descent` | `descent <alt> <target> <dist> [speed]` | Top of Descent calculator |
+| `crosswind` | `crosswind <wind_dir> <wind_spd> <runway>` | Crosswind component |
+| `fuel` | `fuel <fuel> <consumption> [speed]` | Fuel endurance & range |
+| `tas` | `tas <IAS> <altitude> [temp]` | True Airspeed calculator |
+| `ete` | `ete <distance> <speed> [ETD]` | Time enroute calculator |
+
+### Airport Information
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `notam` | `notam <ICAO>` | Active NOTAMs |
+| `ainfo` | `ainfo <ICAO/IATA>` | Airport information |
+| `runway` | `runway <ICAO>` | Runway info with wind |
 | `search` | `search <name>` | Search airports by name |
 
 ### Flights
@@ -60,8 +65,24 @@ Mention the bot followed by your command:
 ### AIP (Spain)
 | Command | Description |
 |---------|-------------|
-| `amendments` | Get AIP Spain amendments |
-| `airac` | Current and next AIRAC cycle info |
+| `amendments` | AIP Spain amendments |
+| `airac` | Current AIRAC cycle info |
+
+### Utilities
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `convert` | `convert <value> <unit>` | Unit conversions (ft/m, nm/km, etc.) |
+| `zulu` | `zulu` | Current UTC time worldwide |
+| `phonetic` | `phonetic <text>` | ICAO phonetic alphabet |
+| `squawk` | `squawk [code]` | Transponder code meanings |
+
+### Information
+| Command | Description |
+|---------|-------------|
+| `help` | All commands |
+| `ping` | Bot latency |
+| `about` | About the bot |
+| `status` | Bot uptime |
 
 ## Getting Started
 
