@@ -1,50 +1,60 @@
-const config = require("../../../config/config.json");
-const settings = require("../../../config/settings.json");
 module.exports = {
     name: "help",
     category: "Information",
-    aliases: ["h", "commandinfo", "cmds", "cmd", "halp"],
+    aliases: ["h", "commands", "cmds", "cmd"],
     cooldown: 3,
-    usage: "help [Commandname]",
-    description: "Returns all Commands, or one specific command",
+    usage: "help [command]",
+    description: "Shows all commands or info about a specific command.",
     run: async (client, message, args, chatId, text, prefix) => {
         try {
             if (args[0]) {
-                const cmd = client.commands.get(args[0].toLowerCase()) || client.commands.get(client.aliases.get(args[0].toLowerCase()));
+                const cmd = client.commands.get(args[0].toLowerCase()) ||
+                           client.commands.get(client.aliases.get(args[0].toLowerCase()));
+
                 if (!cmd) {
-                    return message.reply(`No Information found for command *${args[0].toLowerCase()}*`);
+                    return message.reply(`No command found: *${args[0].toLowerCase()}*`);
                 }
-                let reply = `*Command name*: \`${cmd.name}\`\n`;
-                reply += `*Detailed Information about*: \`${cmd.name}\`\n`;
-                if (cmd.description) reply += `*Description*: \`${cmd.description}\`\n`;
-                if (cmd.aliases) reply += `*Aliases*: \`${cmd.aliases.map((a) => `${a}`).join("`, `")}\`\n`;
-                if (cmd.cooldown) reply += `*Cooldown*: \`${cmd.cooldown} Seconds\`\n`;
-                else reply += `*Cooldown*: \`${settings.default_cooldown_in_sec} Second\`\n`;
-                if (cmd.usage) {
-                    reply += `*Usage*: \`${prefix}${cmd.usage}\`\n`;
-                    reply += `Syntax: <> = required, [] = optional`;
+
+                let reply = `*Command: ${cmd.name}*\n\n`;
+                if (cmd.description) reply += `📝 *Description:* ${cmd.description}\n`;
+                if (cmd.aliases && cmd.aliases.length > 0) {
+                    reply += `🔀 *Aliases:* ${cmd.aliases.join(', ')}\n`;
                 }
+                if (cmd.usage) reply += `💡 *Usage:* ${cmd.usage}\n`;
+                if (cmd.cooldown) reply += `⏱️ *Cooldown:* ${cmd.cooldown}s\n`;
+
+                reply += `\n_Syntax: <required> [optional]_`;
                 return message.reply(reply);
-            } else {
-                let reply = "HELP MENU 🔰 Commands\n";
-                reply += `To see command Descriptions and Information, type: ${prefix}help [CMD NAME]\n`;
-                const commands = (category) => {
-                    return Array.from(client.commands.values()).filter((cmd) => cmd.category === category).map((cmd) => `\`${cmd.name}\``);
-                };
-                try {
-                    for (let i = 0; i < client.categories.length; i += 1) {
-                        const current = client.categories[i];
-                        const items = commands(current);
-                        reply += `*${current.toUpperCase()} [${items.length}]*: ${items.join(", ")}\n`;
-                    }
-                } catch (e) {
-                    console.log(String(e.stack));
-                }
-                message.reply(reply);
             }
+
+            // Show all commands grouped by category
+            let reply = `*WhatsAV Commands* ✈️\n\n`;
+            reply += `_Private chat: write command directly_\n`;
+            reply += `_Groups: @mention bot + command_\n\n`;
+
+            const categories = {};
+
+            // Group commands by category
+            client.commands.forEach(cmd => {
+                const cat = cmd.category || 'Other';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(cmd.name);
+            });
+
+            // Sort and display
+            const sortedCats = Object.keys(categories).sort();
+            for (const cat of sortedCats) {
+                const cmds = categories[cat].sort();
+                reply += `*${cat}* (${cmds.length})\n`;
+                reply += `${cmds.map(c => `\`${c}\``).join(' ')}\n\n`;
+            }
+
+            reply += `_Type_ \`help <command>\` _for details_`;
+            return message.reply(reply);
+
         } catch (e) {
-            console.log(String(e.stack));
-            return message.reply(`❌ ERROR | An error occurred\n\`\`\`${e.message ? String(e.message).slice(0, 2000) : String(e).slice(0, 2000)}\`\`\``);
+            console.error('Help error:', e);
+            return message.reply(`❌ Error: ${e.message}`);
         }
     }
-}
+};

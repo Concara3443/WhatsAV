@@ -21,6 +21,7 @@ ${pkg.description}
 *Contact:*
 WhatsApp: +44 73 0856 4711
 GitHub: github.com/Concara3443/WhatsAV
+Web: guillermocort.es
 
 *How to use:*
 - Private chat: Write the command directly (e.g., \`metar LEMD\`)
