@@ -2,6 +2,8 @@
 
 WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number **+44 73 0856 4711** or by following [https://wa.me/447308564711](https://wa.me/447308564711).
 
+**Author:** Guillermo Cortés | [guillermocort.es](https://guillermocort.es)
+
 ## Features
 
 - **Aviation Data**: Get real-time METAR, TAF, NOTAMs, and airport information.
@@ -41,6 +43,8 @@ Mention the bot followed by your command:
 |---------|-------|-------------|
 | `metar` | `metar <ICAO> [ICAO...]` | Get METAR data for airports |
 | `taf` | `taf <ICAO> [ICAO...]` | Get TAF forecast for airports |
+| `wx` | `wx <ICAO>` | Human-readable weather summary |
+| `decode` | `decode <ICAO>` | Detailed METAR decode with explanations |
 | `notam` | `notam <ICAO>` | Get active NOTAMs for an airport |
 | `ainfo` | `ainfo <ICAO/IATA>` | Get airport information |
 | `runway` | `runway <ICAO>` | Get runway information with wind conditions |
@@ -55,6 +59,7 @@ Mention the bot followed by your command:
 | Command | Description |
 |---------|-------------|
 | `amendments` | Get AIP Spain amendments |
+| `airac` | Current and next AIRAC cycle info |
 
 ## Getting Started
 
@@ -121,6 +126,12 @@ Mention the bot followed by your command:
 ## Contributing
 
 Feel free to fork the repository and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
+
+## Author
+
+**Guillermo Cortés**
+- Website: [guillermocort.es](https://guillermocort.es)
+- GitHub: [Concara3443](https://github.com/Concara3443)
 
 ## License
 
