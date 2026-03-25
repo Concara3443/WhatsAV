@@ -1,4 +1,21 @@
-# WhatsAV
+<p align="center">
+  <img src="assets/images/logo.png" alt="WhatsAV Logo" width="200">
+</p>
+
+<h1 align="center">WhatsAV</h1>
+
+<p align="center">
+  <strong>Aviation Bot for WhatsApp</strong><br>
+  Real-time METAR, TAF, flight calculators & more
+</p>
+
+<p align="center">
+  <a href="https://wa.me/447308564711?text=Hi!%20How%20does%20WhatsAV%20work%3F">
+    <img src="https://img.shields.io/badge/WhatsApp-Chat%20Now-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Chat on WhatsApp">
+  </a>
+</p>
+
+---
 
 WhatsAV is a WhatsApp bot designed for aviation enthusiasts. You can chat with the bot using the number **+44 73 0856 4711** or by clicking the link below:
 
