@@ -7,7 +7,21 @@ const client = new Client({
     dataPath: "C:\\Users\\Administrator\\Documents\\Github\\WhatsAV\\.wwebjs_auth"
   }),
   puppeteer: {
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    headless: true,
+    executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--disable-gpu"
+    ],
+  },
+  webVersionCache: {
+    type: 'remote',
+    remotePath: 'https://raw.githubusercontent.com/AveniaAi/AveniaSDK/main/cacheWhatsapp/webVersionCache.json',
   },
 });
 

@@ -1,5 +1,34 @@
 const { fetchData } = require("../../utils/api.js");
-const { Location } = require('whatsapp-web.js');
+const { Location, MessageMedia } = require('whatsapp-web.js');
+const axios = require('axios');
+
+// Helper function to check if a Spanish AIP/VFR chart exists
+async function checkSpanishCharts(icao) {
+    if (!icao || !icao.startsWith("LE")) return null;
+
+    const result = { charts: [], imageUrl: null };
+    const aipUrl = `https://aip.enaire.es/AIP/contenido_AIP/AD/AD2/${icao}/LE_AD_2_${icao}_en.pdf`;
+    const vfrUrl = `https://guiavfr.enaire.es/contenido_GuiaVFR/AD/LE_guiaVFR_${icao}.html`;
+    const vfrImageUrl = `https://guiavfr.enaire.es/contenido_GuiaVFR/AD/LE_guiaVFR_${icao}_img/LE_guiaVFR_${icao}_ADC.png`;
+
+    try {
+        const aipResponse = await axios.head(aipUrl, { timeout: 5000, validateStatus: (s) => s < 500 });
+        if (aipResponse.status === 200) result.charts.push({ type: "AIP", url: aipUrl });
+    } catch (e) { /* ignore */ }
+
+    try {
+        const vfrResponse = await axios.head(vfrUrl, { timeout: 5000, validateStatus: (s) => s < 500 });
+        if (vfrResponse.status === 200) result.charts.push({ type: "VFR Guide", url: vfrUrl });
+    } catch (e) { /* ignore */ }
+
+    try {
+        const imgResponse = await axios.head(vfrImageUrl, { timeout: 5000, validateStatus: (s) => s < 500 });
+        if (imgResponse.status === 200) result.imageUrl = vfrImageUrl;
+    } catch (e) { /* ignore */ }
+
+    return (result.charts.length > 0 || result.imageUrl) ? result : null;
+}
+
 module.exports = {
     name: "ainfo",
     category: "Airports",
@@ -21,7 +50,7 @@ module.exports = {
             const iType = code.length === 3 ? "iata" : "icao";
             const endpoint = `https://aerodatabox.p.rapidapi.com/airports/${iType}/${code}`;
 
-            fetchData(endpoint, {}).then(function (response) {
+            fetchData(endpoint, {}).then(async function (response) {
 
                 let replyMessage = `*${response.fullName} (${response.shortName})*`;
 
@@ -33,17 +62,35 @@ module.exports = {
                 if (response.urls.twitter) replyMessage += `\n- *Twitter*: ${response.urls.twitter}`;
                 if (response.urls.flightRadar) replyMessage += `\n- *Flight Radar*: ${response.urls.flightRadar}`;
 
+                // Check for Spanish AIP charts
+                let spanishData = null;
+                if (response.icao && response.icao.startsWith("LE")) {
+                    spanishData = await checkSpanishCharts(response.icao);
+                    if (spanishData && spanishData.charts.length > 0) {
+                        replyMessage += `\n\n*📄 AIP Spain:*`;
+                        spanishData.charts.forEach(chart => {
+                            replyMessage += `\n- *${chart.type}*: ${chart.url}`;
+                        });
+                    }
+                }
+
                 const location = new Location(response.location.lat, response.location.lon, {
                     name: response.fullName,
                     url: response.urls.googleMaps
                 });
 
-                message.reply(replyMessage).then(() => {
-                    client.sendMessage(chatId, location)
-                }).catch(error => {
-                    console.error(error);
-                    message.reply("❌ ERROR | Failed to send location.");
-                });
+                await message.reply(replyMessage);
+                await client.sendMessage(chatId, location);
+
+                // Send VFR chart image if available
+                if (spanishData && spanishData.imageUrl) {
+                    try {
+                        const media = await MessageMedia.fromUrl(spanishData.imageUrl, { unsafeMime: true });
+                        await client.sendMessage(chatId, media, { caption: `*VFR Chart - ${response.icao}*` });
+                    } catch (imgError) {
+                        console.error('Error sending VFR image:', imgError);
+                    }
+                }
 
             }).catch(error => {
                 console.error(error);
