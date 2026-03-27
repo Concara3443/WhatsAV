@@ -20,6 +20,10 @@ const cooldowns = new Map();
 const aliases = new Map();
 const categories = fs.readdirSync(path.join(__dirname, 'commands'));
 
+// Estado de reconexión
+let isReconnecting = false;
+let currentSock = null;
+
 // Cargar comandos
 function loadCommands() {
     let amount = 0;
@@ -54,111 +58,123 @@ function loadCommands() {
 
 // Función principal para conectar
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
-    const { version, isLatest } = await fetchLatestBaileysVersion();
+    // Evitar reconexiones concurrentes
+    if (isReconnecting) {
+        console.log('Already reconnecting, skipping...');
+        return;
+    }
+    isReconnecting = true;
 
-    console.log(`Using Baileys v${version.join('.')}, isLatest: ${isLatest}`);
+    // Limpiar socket anterior si existe
+    if (currentSock) {
+        try {
+            currentSock.ev.removeAllListeners();
+            currentSock.ws.close();
+        } catch (e) { /* ignore */ }
+        currentSock = null;
+    }
 
-    const sock = makeWASocket({
-        version,
-        logger: pino({ level: 'silent' }),
-        auth: state,
-        browser: ['WhatsAV', 'Chrome', '120.0.0'],
-        markOnlineOnConnect: true,
-        syncFullHistory: false,
-    });
+    try {
+        const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
+        const { version, isLatest } = await fetchLatestBaileysVersion();
 
-    // Objeto cliente compatible con los comandos existentes
-    const client = {
-        sock,
-        commands,
-        cooldowns,
-        aliases,
-        categories,
-        info: {
-            me: {
-                user: null,
-                server: 's.whatsapp.net'
+        console.log(`Using Baileys v${version.join('.')}, isLatest: ${isLatest}`);
+
+        const sock = makeWASocket({
+            version,
+            logger: pino({ level: 'silent' }),
+            auth: state,
+            browser: ['WhatsAV', 'Chrome', '120.0.0'],
+            markOnlineOnConnect: true,
+            syncFullHistory: false,
+        });
+
+        currentSock = sock;
+
+        // Objeto cliente compatible con los comandos existentes
+        const client = {
+            sock,
+            commands,
+            cooldowns,
+            aliases,
+            categories,
+            info: {
+                me: {
+                    user: null,
+                    server: 's.whatsapp.net'
+                }
             }
-        }
-    };
+        };
 
-    // Guardar credenciales cuando cambien
-    sock.ev.on('creds.update', saveCreds);
+        // Guardar credenciales cuando cambien
+        sock.ev.on('creds.update', saveCreds);
 
-    // Manejar actualizaciones de conexión
-    sock.ev.on('connection.update', async (update) => {
-        const { connection, lastDisconnect, qr } = update;
+        // Manejar actualizaciones de conexión
+        sock.ev.on('connection.update', async (update) => {
+            const { connection, lastDisconnect, qr } = update;
 
-        if (qr) {
-            console.log('\nScan this QR code with WhatsApp:\n');
-            qrcode.generate(qr, { small: true });
-        }
-
-        if (connection === 'close') {
-            const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
-
-            console.log('Connection closed, reason:', reason);
-
-            if (reason === DisconnectReason.badSession) {
-                console.log('Bad session, delete auth folder and scan again');
-                fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
-                connectToWhatsApp();
-            } else if (reason === DisconnectReason.connectionClosed) {
-                console.log('Connection closed, reconnecting...');
-                connectToWhatsApp();
-            } else if (reason === DisconnectReason.connectionLost) {
-                console.log('Connection lost, reconnecting...');
-                connectToWhatsApp();
-            } else if (reason === DisconnectReason.connectionReplaced) {
-                console.log('Connection replaced, another session opened. Close current session first.');
-                process.exit(1);
-            } else if (reason === DisconnectReason.loggedOut) {
-                console.log('Device logged out, delete auth folder and scan again');
-                fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
-                connectToWhatsApp();
-            } else if (reason === DisconnectReason.restartRequired) {
-                console.log('Restart required, restarting...');
-                connectToWhatsApp();
-            } else if (reason === DisconnectReason.timedOut) {
-                console.log('Connection timed out, reconnecting...');
-                connectToWhatsApp();
-            } else {
-                console.log('Unknown disconnect reason:', reason);
-                connectToWhatsApp();
+            if (qr) {
+                console.log('\nScan this QR code with WhatsApp:\n');
+                qrcode.generate(qr, { small: true });
             }
-        } else if (connection === 'open') {
-            // Actualizar información del bot
-            const me = sock.user;
-            client.info.me.user = me?.id?.split(':')[0] || me?.id?.split('@')[0];
-            client.info.me.lid = me?.lid?.split(':')[0] || me?.lid?.split('@')[0];
-            client.info.me.fullJid = me?.id;
-            client.info.me.fullLid = me?.lid;
 
-            console.log('##############################');
-            console.log('#                            #');
-            console.log('#      Bot is ready!         #');
-            console.log('#                            #');
-            console.log('##############################');
-            console.log(`Logged in as: ${client.info.me.user}`);
-            console.log(`LID: ${client.info.me.lid}`);
-        }
-    });
+            if (connection === 'close') {
+                const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+                console.log('Connection closed, reason:', reason);
 
-    // Manejar mensajes
-    sock.ev.on('messages.upsert', async ({ messages, type }) => {
-        if (type !== 'notify') return;
+                isReconnecting = false;
 
-        for (const msg of messages) {
-            try {
-                await handleMessage(client, msg);
-            } catch (e) {
-                console.error('Error handling message:', e);
+                if (reason === DisconnectReason.connectionReplaced) {
+                    console.log('Connection replaced, another session opened. Exiting.');
+                    process.exit(1);
+                } else if (reason === DisconnectReason.loggedOut || reason === DisconnectReason.badSession) {
+                    console.log('Session invalid, deleting auth folder...');
+                    fs.rmSync(AUTH_FOLDER, { recursive: true, force: true });
+                    setTimeout(() => connectToWhatsApp(), 3000);
+                } else {
+                    // Reconectar con backoff
+                    console.log('Reconnecting in 3 seconds...');
+                    setTimeout(() => connectToWhatsApp(), 3000);
+                }
+            } else if (connection === 'open') {
+                isReconnecting = false;
+
+                // Actualizar información del bot
+                const me = sock.user;
+                client.info.me.user = me?.id?.split(':')[0] || me?.id?.split('@')[0];
+                client.info.me.lid = me?.lid?.split(':')[0] || me?.lid?.split('@')[0];
+                client.info.me.fullJid = me?.id;
+                client.info.me.fullLid = me?.lid;
+
+                console.log('##############################');
+                console.log('#                            #');
+                console.log('#      Bot is ready!         #');
+                console.log('#                            #');
+                console.log('##############################');
+                console.log(`Logged in as: ${client.info.me.user}`);
+                console.log(`LID: ${client.info.me.lid}`);
             }
-        }
-    });
+        });
 
-    return sock;
+        // Manejar mensajes
+        sock.ev.on('messages.upsert', async ({ messages, type }) => {
+            if (type !== 'notify') return;
+
+            for (const msg of messages) {
+                try {
+                    await handleMessage(client, msg);
+                } catch (e) {
+                    console.error('Error handling message:', e);
+                }
+            }
+        });
+
+        return sock;
+    } catch (e) {
+        console.error('Error connecting:', e);
+        isReconnecting = false;
+        setTimeout(() => connectToWhatsApp(), 5000);
+    }
 }
 
 // Función para limpiar caracteres invisibles de WhatsApp

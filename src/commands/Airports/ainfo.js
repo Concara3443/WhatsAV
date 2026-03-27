@@ -126,8 +126,6 @@ module.exports = {
             const iType = code.length === 3 ? "iata" : "icao";
             const endpoint = `https://aerodatabox.p.rapidapi.com/airports/${iType}/${code}`;
 
-            let foundInApi = false;
-
             try {
                 const response = await fetchData(endpoint, {});
 
@@ -147,10 +145,11 @@ module.exports = {
                 if (response.urls?.wikipedia) replyMessage += `\n- *Wikipedia*: ${response.urls.wikipedia}`;
                 if (response.urls?.flightRadar) replyMessage += `\n- *Flight Radar*: ${response.urls.flightRadar}`;
 
-                // Check for Spanish charts
+                // Check for Spanish charts (cached for reuse)
                 const icaoCode = response.icao || code;
+                let spanishData = null;
                 if (icaoCode.startsWith("LE")) {
-                    const spanishData = await getSpanishCharts(icaoCode);
+                    spanishData = await getSpanishCharts(icaoCode);
                     if (spanishData) {
                         replyMessage += `\n\n*Spain AIP/VFR:*`;
                         if (spanishData.aipUrl) replyMessage += `\n- *AIP*: ${spanishData.aipUrl}`;
@@ -168,24 +167,21 @@ module.exports = {
                             location: {
                                 degreesLatitude: response.location.lat,
                                 degreesLongitude: response.location.lon,
-                                name: response.fullName,
+                                name: airportName,
                                 url: response.urls?.googleMaps || ''
                             }
                         });
                     } catch (e) { /* ignore */ }
                 }
 
-                // Send VFR chart image if available (Spanish airports)
-                if (icaoCode.startsWith("LE")) {
-                    const spanishData = await getSpanishCharts(icaoCode);
-                    if (spanishData?.imageUrl) {
-                        try {
-                            await client.sock.sendMessage(chatId, {
-                                image: { url: spanishData.imageUrl },
-                                caption: `*VFR Chart - ${icaoCode}*`
-                            });
-                        } catch (e) { /* ignore */ }
-                    }
+                // Send VFR chart image if available (reuse cached spanishData)
+                if (spanishData?.imageUrl) {
+                    try {
+                        await client.sock.sendMessage(chatId, {
+                            image: { url: spanishData.imageUrl },
+                            caption: `*VAC - ${icaoCode}*`
+                        });
+                    } catch (e) { /* ignore */ }
                 }
 
             } catch (apiError) {
@@ -213,7 +209,7 @@ module.exports = {
                             try {
                                 await client.sock.sendMessage(chatId, {
                                     image: { url: vfrInfo.imageUrl },
-                                    caption: `*VFR Chart - ${code}*`
+                                    caption: `*VAC - ${code}*`
                                 });
                             } catch (e) { /* ignore */ }
                         }

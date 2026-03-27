@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node src/index.js"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "author": "Guillermo Cortés",
   "license": "MIT",
   "dependencies": {
@@ -13,7 +16,6 @@
     "@whiskeysockets/baileys": "^7.0.0-rc.9",
     "axios": "^1.13.5",
     "dotenv": "^16.4.5",
-    "node-dectalk": "^0.1.1",
     "pino": "^9.6.0",
     "qrcode-terminal": "^0.12.0"
   }
