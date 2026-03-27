@@ -1,16 +1,12 @@
-# Repository files
-/session
-.wwebjs_*
-.wwebjs_auth/
+# Repository files - Baileys session
+auth_info_baileys/
 
 # WinSW Service files
 *.exe
 *.xml
 WhatsAV-service*
 logs/
-
-# Puppeteer
-.puppeteerrc.cjs
+winsw/
 
 # Claude Code
 .claude/
